@@ -207,7 +207,7 @@ static void        spi_setbits(FAR struct spi_dev_s *dev, int nbits);
 static int         spi_hwfeatures(FAR struct spi_dev_s *dev,
                                   spi_hwfeatures_t features);
 #endif
-static uint32_t    spi_send(FAR struct spi_dev_s *dev, uint32_t wd);
+static uint16_t    spi_send(FAR struct spi_dev_s *dev, uint16_t wd);
 static void        spi_exchange(FAR struct spi_dev_s *dev,
                                 FAR const void *txbuffer, FAR void *rxbuffer,
                                 size_t nwords);
@@ -1492,7 +1492,7 @@ static int spi_hwfeatures(FAR struct spi_dev_s *dev,
  *
  ****************************************************************************/
 
-static uint32_t spi_send(FAR struct spi_dev_s *dev, uint32_t wd)
+static uint16_t spi_send(FAR struct spi_dev_s *dev, uint16_t wd)
 {
   FAR struct stm32_spidev_s *priv = (FAR struct stm32_spidev_s *)dev;
   uint32_t regval;
@@ -1507,8 +1507,8 @@ static uint32_t spi_send(FAR struct spi_dev_s *dev, uint32_t wd)
 
   if (spi_9to16bitmode(priv))
     {
-      spi_writeword(priv, (uint16_t)(wd & 0xffff));
-      ret = (uint32_t)spi_readword(priv);
+      spi_writeword(priv, wd);
+      ret = spi_readword(priv);
     }
   else
     {
@@ -1596,7 +1596,7 @@ static void spi_exchange_nodma(FAR struct spi_dev_s *dev,
 
           /* Exchange one word */
 
-          word = (uint16_t)spi_send(dev, (uint32_t)word);
+          word = spi_send(dev, word);
 
           /* Is there a buffer to receive the return value? */
 
@@ -1629,7 +1629,7 @@ static void spi_exchange_nodma(FAR struct spi_dev_s *dev,
 
           /* Exchange one word */
 
-          word = (uint8_t)spi_send(dev, (uint32_t)word);
+          word = (uint8_t)spi_send(dev, (uint16_t)word);
 
           /* Is there a buffer to receive the return value? */
 
